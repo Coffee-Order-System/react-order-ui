@@ -1,38 +1,36 @@
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/css/bootstrap.css';
+import React, {useEffect, useState} from 'react';
 import {ProductList} from "./components/ProductList";
 import {Summary} from "./components/Summary";
-import React, {useState, useEffect} from 'react';
 import axios from "axios";
 
 function App() {
-
     const [products, setProducts] = useState([
-        {productId: 'uuid-1', productName: '콜롬비아 커피1', category: '커피빈', price: 3000},
-        {productId: 'uuid-2', productName: '콜롬비아 커피2', category: '커피빈', price: 3000},
-        {productId: 'uuid-3', productName: '콜롬비아 커피3', category: '커피빈', price: 3000},
+        {productId: 'uuid-1', productName: '콜롬비아 커피 1', category: '커피빈', price: 5000},
+        {productId: 'uuid-2', productName: '콜롬비아 커피 2', category: '커피빈', price: 5000},
+        {productId: 'uuid-3', productName: '콜롬비아 커피 3', category: '커피빈', price: 5000},
     ]);
-
     const [items, setItems] = useState([]);
-
-    const handleAddClicked = id => {
-        const product = products.find(v => v.id === id);
-        const found = items.find(v => v.productId === id);
+    const handleAddClicked = productId => {
+        const product = products.find(v => v.productId === productId);
+        const found = items.find(v => v.productId === productId);
         const updatedItems =
-            found ? items.map(v => (v.productId === id) ? {...v, count: v.count + 1} : v) : [...items, {...product, count: 1}]
-        setItems(updatedItems)
-
-        console.log(products.find(v => v.id === id), "clicked")
-    };
+            found ? items.map(v => (v.productId === productId) ? {...v, count: v.count + 1} : v) : [...items, {
+                ...product,
+                count: 1
+            }]
+        setItems(updatedItems);
+    }
 
     useEffect(() => {
         axios.get('http://localhost:8080/api/v1/products')
-            .then(v => setProducts(v.data))
-    }, [])
+            .then(v => setProducts(v.data));
+    }, []);
 
     const handleOrderSubmit = (order) => {
         if (items.length === 0) {
-            alert("상품을 추가해주세요.")
+            alert("아이템을 추가해 주세요!");
         } else {
             axios.post('http://localhost:8080/api/v1/orders', {
                 email: order.email,
@@ -48,8 +46,8 @@ function App() {
                 v => alert("주문이 정상적으로 접수되었습니다."),
                 e => {
                     alert("서버 장애");
-                console.error(e)
-            })
+                    console.error(e);
+                })
         }
     }
 
@@ -61,10 +59,10 @@ function App() {
             <div className="card">
                 <div className="row">
                     <div className="col-md-8 mt-4 d-flex flex-column align-items-start p-3 pt-0">
-                        <ProductList products={products} onAddClick={handleAddClicked}></ProductList>
+                        <ProductList products={products} onAddClick={handleAddClicked}/>
                     </div>
                     <div className="col-md-4 summary p-4">
-                        <Summary items={items} onOrderSubmit={handleOrderSubmit}></Summary>
+                        <Summary items={items} onOrderSubmit={handleOrderSubmit}/>
                     </div>
                 </div>
             </div>
